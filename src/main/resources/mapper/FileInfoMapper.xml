@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sen.netdisk.mapper.FileInfoDAO">
+
+    <resultMap id="BaseResultMap" type="com.sen.netdisk.entity.FileInfoDO">
+        <id column="file_id" jdbcType="VARCHAR" property="fileId"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="md5" jdbcType="VARCHAR" property="md5"/>
+        <result column="parent_id" jdbcType="VARCHAR" property="parentId"/>
+        <result column="file_size" jdbcType="BIGINT" property="fileSize"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="file_cover" jdbcType="VARCHAR" property="fileCover"/>
+        <result column="file_path" jdbcType="VARCHAR" property="filePath"/>
+        <result column="folder_type" jdbcType="TINYINT" property="folderType"/>
+        <result column="file_category" jdbcType="TINYINT" property="fileCategory"/>
+        <result column="file_type" jdbcType="TINYINT" property="fileType"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="del_flag" jdbcType="TINYINT" property="delFlag"/>
+        <result column="recovery_time" jdbcType="TIMESTAMP" property="recoveryTime"/>
+        <result column="del_time" jdbcType="TIMESTAMP" property="delTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <insert id="insertBatch" parameterType="com.sen.netdisk.entity.FileInfoDO">
+        insert into
+        tbas_fileinfo(file_id,user_id,md5,parent_id,file_size,file_name,file_cover,
+        file_path,folder_type,file_category,file_type,status,del_flag,
+        create_time,update_time)
+        values
+        <foreach collection="fileInfoList" item="item" separator=",">
+            (#{item.fileId},#{item.userId},#{item.md5},#{item.parentId},#{item.fileSize},#{item.fileName}, #{item.fileCover},
+             #{item.filePath},#{item.folderType},#{item.fileCategory},#{item.fileType},#{item.status},#{item.delFlag},
+             now(),now())
+        </foreach>
+    </insert>
+    <update id="updateFileInfoStatus">
+        update tbas_fileinfo
+        <set>
+            <if test="fileInfoDO.md5 != null">
+                md5 = #{fileInfoDO.md5},
+            </if>
+            <if test="fileInfoDO.parentId != null">
+                parent_id = #{fileInfoDO.parentId},
+            </if>
+            <if test="fileInfoDO.fileSize != null">
+                file_size = #{fileInfoDO.fileSize},
+            </if>
+            <if test="fileInfoDO.fileName != null">
+                file_name = #{fileInfoDO.fileName},
+            </if>
+            <if test="fileInfoDO.fileCover != null">
+                file_cover = #{fileInfoDO.fileCover},
+            </if>
+            <if test="fileInfoDO.filePath != null">
+                file_path = #{fileInfoDO.filePath},
+            </if>
+            <if test="fileInfoDO.updateTime != null">
+                update_time = #{fileInfoDO.updateTime},
+            </if>
+            <if test="fileInfoDO.status != null">
+                status = #{fileInfoDO.status},
+            </if>
+            <if test="fileInfoDO.recoveryTime != null">
+                recovery_time = #{fileInfoDO.recoveryTime},
+            </if>
+            <if test="fileInfoDO.delFlag != null">
+                del_flag = #{fileInfoDO.delFlag},
+            </if>
+            update_time = now()
+        </set>
+        where file_id = #{fileId,jdbcType=VARCHAR}
+        and user_id = #{userId,jdbcType=VARCHAR}
+        and status = #{oldStatus,jdbcType=VARCHAR}
+    </update>
+    <update id="updateFileInfoDelFlag">
+        update tbas_fileinfo
+        set del_flag = #{fileInfoDO.delFlag},
+        <if test="fileInfoDO.delTime != null">
+            del_time = #{fileInfoDO.delTime},
+        </if>
+            update_time = now()
+        where file_id = #{fileId}
+        and user_id = #{userId}
+        and del_flag = #{oldDelFlag}
+    </update>
+    <update id="update">
+        update tbas_fileinfo
+        <set>
+            <if test="fileInfoDO.md5 != null">
+                md5 = #{fileInfoDO.md5},
+            </if>
+            <if test="fileInfoDO.parentId != null">
+                parent_id = #{fileInfoDO.parentId},
+            </if>
+            <if test="fileInfoDO.fileSize != null">
+                file_size = #{fileInfoDO.fileSize},
+            </if>
+            <if test="fileInfoDO.fileName != null">
+                file_name = #{fileInfoDO.fileName},
+            </if>
+            <if test="fileInfoDO.fileCover != null">
+                file_cover = #{fileInfoDO.fileCover},
+            </if>
+            <if test="fileInfoDO.filePath != null">
+                file_path = #{fileInfoDO.filePath},
+            </if>
+            <if test="fileInfoDO.updateTime != null">
+                update_time = #{fileInfoDO.updateTime},
+            </if>
+            <if test="fileInfoDO.status != null">
+                status = #{fileInfoDO.status},
+            </if>
+            <if test="fileInfoDO.recoveryTime != null">
+                recovery_time = #{fileInfoDO.recoveryTime},
+            </if>
+            <if test="fileInfoDO.delFlag != null">
+                del_flag = #{fileInfoDO.delFlag},
+            </if>
+            <if test="fileInfoDO.delTime != null">
+                del_time = #{fileInfoDO.delTime},
+            </if>
+            update_time = now()
+        </set>
+        where file_id = #{fileInfoDO.fileId,jdbcType=VARCHAR}
+        and user_id = #{fileInfoDO.userId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateDelFlagBatch">
+        update tbas_fileinfo
+        set del_flag = #{delFlag},
+        <if test="delTime != null">
+            del_time = #{delTime},
+        </if>
+        <if test="recoveryTime != null">
+            recovery_time = #{recoveryTime},
+        </if>
+        update_time = now()
+        where user_id = #{userId}
+        and del_flag = #{oldDelFlag}
+        <if test="fileIdList != null and !fileIdList.isEmpty()">
+            and file_id in
+            <foreach collection="fileIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+    <update id="updateBatch" parameterType="java.util.List">
+        update tbas_fileinfo
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="md5 = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.md5}
+                </foreach>
+            </trim>
+            <trim prefix="parent_id = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.parentId}
+                </foreach>
+            </trim>
+            <trim prefix="file_size = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.fileSize}
+                </foreach>
+            </trim>
+            <trim prefix="file_name = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.fileName}
+                </foreach>
+            </trim>
+            <trim prefix="file_cover = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.fileCover}
+                </foreach>
+            </trim>
+            <trim prefix="file_path = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.filePath}
+                </foreach>
+            </trim>
+            <trim prefix="status = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.status}
+                </foreach>
+            </trim>
+            <trim prefix="recovery_time = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.recoveryTime}
+                </foreach>
+            </trim>
+            <trim prefix="del_flag = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.delFlag}
+                </foreach>
+            </trim>
+            <trim prefix="del_time = case file_id" suffix="end,">
+                <foreach collection="fileInfoList" item="item">
+                    when #{item.fileId} then #{item.delTime}
+                </foreach>
+            </trim>
+            update_time = now()
+        </trim>
+        where (user_id, file_id) in
+        <foreach collection="fileInfoList" item="item" open="(" close=")" separator=",">
+            (#{item.userId}, #{item.fileId})
+        </foreach>
+        <if test="oldDelFlag != null">
+            and del_flag = #{oldDelFlag}
+        </if>
+    </update>
+    <delete id="deleteByFileId">
+        delete
+        from tbas_fileinfo
+        where file_id = #{fileId,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteByUserId">
+        delete
+        from tbas_fileinfo
+        where user_id = #{userId,jdbcType=VARCHAR}
+    </delete>
+    <select id="listFileInfoWithPage" parameterType="com.sen.netdisk.dto.query.FileInfoQuery" resultType="com.sen.netdisk.entity.FileInfoDO" databaseId="mysql">
+        select *
+        from tbas_fileinfo
+        where user_id = #{query.userId,jdbcType=VARCHAR}
+        and del_flag = #{query.delFlag,jdbcType=INTEGER}
+        <if test="query.fileCategory != null">
+            and file_category = #{query.fileCategory,jdbcType=INTEGER}
+        </if>
+        <if test="query.parentId != null">
+            and parent_id = #{query.parentId,jdbcType=VARCHAR}
+        </if>
+        <if test="query.fileNameFuzzy != null">
+            and file_name like concat(concat('%',#{query.fileNameFuzzy}),'%')
+        </if>
+        <if test="query.delFlag != null">
+            and del_flag = #{query.delFlag,jdbcType=INTEGER}
+        </if>
+        order by update_time desc
+    </select>
+
+    <select id="queryList" resultType="com.sen.netdisk.entity.FileInfoDO"
+            parameterType="com.sen.netdisk.dto.query.FileInfoQuery">
+        select *
+        from tbas_fileinfo
+        <where>
+            <if test="query.userId != null">
+                and user_id = #{query.userId,jdbcType=VARCHAR}
+            </if>
+            <if test="query.parentId != null">
+                and parent_id = #{query.parentId,jdbcType=VARCHAR}
+            </if>
+            <if test="query.delFlag != null">
+                and del_flag = #{query.delFlag,jdbcType=INTEGER}
+            </if>
+            <if test="query.md5 != null">
+                and md5 = #{query.md5,jdbcType=VARCHAR}
+            </if>
+            <if test="query.status != null">
+                and status = #{query.status,jdbcType=INTEGER}
+            </if>
+            <if test="query.folderType != null">
+                and folder_type = #{query.folderType}
+            </if>
+            <if test="query.fileIdList != null and !query.fileIdList.isEmpty()">
+                and file_id in
+                <foreach collection="query.fileIdList" open="(" close=")" item="fileId" separator=",">
+                    #{fileId,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="query.excludeFileIdList != null and !query.excludeFileIdList.isEmpty()">
+                and file_id not in
+                <foreach collection="query.excludeFileIdList" open="(" close=")" item="excludeFileId" separator=",">
+                    #{excludeFileId,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+    <select id="queryCount" resultType="java.lang.Integer" parameterType="com.sen.netdisk.dto.query.FileInfoQuery"
+            databaseId="mysql">
+        select count(1)
+        from tbas_fileinfo
+        <where>
+            <if test="query.userId != null">
+                and user_id = #{query.userId,jdbcType=VARCHAR}
+            </if>
+            <if test="query.parentId != null">
+                and parent_id = #{query.parentId,jdbcType=VARCHAR}
+            </if>
+            <if test="query.fileName != null">
+                and file_name = #{query.fileName,jdbcType=VARCHAR}
+            </if>
+            <if test="query.folderType != null">
+                and folder_type = #{query.folderType}
+            </if>
+            <if test="query.delFlag != null">
+                and del_flag = #{query.delFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryExpireFileList" resultType="com.sen.netdisk.entity.FileInfoDO" databaseId="mysql">
+        select *
+        from tbas_fileinfo
+        where del_flag = #{delFlag,jdbcType=INTEGER}
+        <if test="delFlag != null and delFlag == 1">
+            and recovery_time is not null
+            and date_sub(now(), interval #{expireDay,jdbcType=INTEGER} day) >= recovery_time
+        </if>
+        <if test="delFlag != null and delFlag == 2">
+            and del_time is not null
+            and date_sub(now(), interval #{expireDay,jdbcType=INTEGER} day) >= del_time
+        </if>
+    </select>
+    <select id="selectUseSpaceByUserId" resultType="java.lang.Long" databaseId="mysql">
+        select ifnull(sum(file_size), 0)
+        from tbas_fileinfo
+        where user_id = #{userId,jdbcType=VARCHAR}
+          and del_flag != '2'
+    </select>
+    <select id="selectByFileIdAndUserId" resultType="com.sen.netdisk.entity.FileInfoDO">
+        select *
+        from tbas_fileinfo
+        where user_id = #{userId,jdbcType=VARCHAR}
+          and file_id = #{fileId,jdbcType=VARCHAR}
+    </select>
+    <select id="queryListSort" resultType="com.sen.netdisk.entity.FileInfoDO" databaseId="mysql">
+        select *
+        from tbas_fileinfo
+        <where>
+            <if test="query.userId != null">
+                and user_id = #{query.userId,jdbcType=VARCHAR}
+            </if>
+            <if test="query.delFlag != null">
+                and del_flag = #{query.delFlag,jdbcType=INTEGER}
+            </if>
+            <if test="query.md5 != null">
+                and md5 = #{query.md5,jdbcType=VARCHAR}
+            </if>
+            <if test="query.status != null">
+                and status = #{query.status,jdbcType=INTEGER}
+            </if>
+            <if test="query.folderType != null">
+                and folder_type = #{query.folderType}
+            </if>
+            <if test="query.fileIdList != null and !query.fileIdList.isEmpty()">
+                and file_id in
+                <foreach collection="query.fileIdList" open="(" close=")" item="fileId" separator=",">
+                    #{fileId,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+        <if test="query.fileIdList != null and !query.fileIdList.isEmpty()">
+            order by field
+            (file_id,
+            <foreach collection="query.fileIdList" item="fileId" separator=",">
+                #{fileId}
+            </foreach>
+            )
+        </if>
+    </select>
+
+</mapper>

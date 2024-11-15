@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sen.netdisk.mapper.ShareInfoDAO">
+
+    <resultMap id="BaseResultMap" type="com.sen.netdisk.entity.ShareInfoDO">
+        <id column="share_id" jdbcType="VARCHAR" property="shareId"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="file_id" jdbcType="VARCHAR" property="fileId"/>
+        <result column="valid_type" jdbcType="TINYINT" property="validType"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="share_time" jdbcType="TIMESTAMP" property="shareTime"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="show_count" jdbcType="INTEGER" property="showCount"/>
+    </resultMap>
+    <update id="updateShareCount">
+        update tbas_share
+        set show_count = show_count + 1
+        where share_id = #{shareId}
+    </update>
+
+    <select id="selectPage" resultType="com.sen.netdisk.dto.FileShareDTO"
+            parameterType="com.sen.netdisk.dto.query.ShareQuery">
+        select sh.*, tf.*
+        from tbas_share sh
+        left join tbas_fileinfo tf on sh.file_id = tf.file_id and sh.user_id = tf.user_id
+        <where>
+            <if test="query.userId != null">
+                sh.user_id =#{query.userId}
+            </if>
+        </where>
+    </select>
+    <select id="selectByShareId" resultType="com.sen.netdisk.entity.ShareInfoDO">
+        select *
+        from tbas_share
+        where share_id = #{shareId}
+    </select>
+
+    <delete id="deleteBatch" databaseId="mysql">
+        delete
+        from tbas_share
+        where user_id = #{userId}
+        <if test="shareIdList != null and !shareIdList.isEmpty()">
+            and share_id in
+            <foreach collection="shareIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+</mapper>

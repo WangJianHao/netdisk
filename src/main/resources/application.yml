@@ -1,0 +1,150 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: netdisk
+  # 数据库配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/netdisk?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  # redis配置
+  redis:
+    host: localhost # Redis服务器地址
+    database: 1 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    password: 123456 # Redis服务器连接密码（默认为空）
+    timeout: 3000ms # 连接超时时间（毫秒）
+  #ES配置
+  elasticsearch:
+    uris: "http://localhost:9200"
+    socket-timeout: "10s"
+    username: "elastic"
+    password: "O9Dagi50JBdBEo+4DJik"
+    restclient:
+      sniffer:
+        interval: "10m"
+        delay-after-failure: "30s"
+    webclient:
+      max-in-memory-size: "1MB"
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+    mongodb:
+      host: localhost
+      port: 27017
+      password:
+      database: sensen-port
+#  rabbitmq:
+#    host: localhost # rabbitmq的连接地址
+#    port: 5672 # rabbitmq的连接端口号
+#    virtual-host: /sen # rabbitmq的虚拟host
+#    username: admin # rabbitmq的用户名
+#    password: admin # rabbitmq的密码
+  quartz:
+    job-store-type: jdbc # quartz任务存储类型：jdbc或memory
+    wait-for-jobs-to-complete-on-shutdown: true # 关闭是等待任务完成
+    overwrite-existing-jobs: true # 可以覆盖已有的任务
+    properties: # quartz原生配置
+      org:
+        quartz:
+          scheduler:
+            instanceName: scheduler # 调度器实例名称
+            instanceId: AUTO # 调度器实例ID自动生成
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore # 调度信息存储处理类
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate # 使用完全兼容JDBC的驱动
+            tablePrefix: qrtz_ # quartz相关表前缀
+            useProperties: false # 是否将JobDataMap中的属性转为字符串存储
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool # 指定线程池实现类，对调度器提供固定大小的线程池
+            threadCount: 10 # 设置并发线程数量
+            threadPriority: 5 # 指定线程优先级
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher #springBoot2.6之后需要设置此项来兼容swagger2
+  #文件分片上传设置单个文件大小和请求总文件大小
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 15MB
+      max-request-size: 15MB
+      #阈值，超过后文件将被写入磁盘
+      #file-size-threshold: 2KB
+    #邮箱配置
+#  mail:
+#    host: smtp.qq.com
+#    username: xxx@qq.com
+#    password: 51da5wdw1441g4e1g4e
+#    default-encoding: UTF-8
+#    properties:
+#      mail:
+#        debug: true
+#        smtp:
+#          socketFactory:
+#            class: javax.net.ssl.SSLSocketFactory
+
+
+mybatis-plus:
+  mapper-locations:
+    - classpath:mapper/*.xml
+  configuration:
+    database-id: mysql
+
+#rocketmq配置
+rocketmq:
+  name-server: 127.0.0.1:9876
+  # 生产者配置
+  producer:
+    # 发送同一类消息的设置为同一个group，保证唯一
+    group: rocketmq-pro-group
+    # 发送消息超时时间,默认3000
+    sendMessageTimeout: 3000
+    # 发送消息失败重试次数，默认2
+    retryTimesWhenSendFailed: 2
+    # 异步消息重试此处，默认2
+    retryTimesWhenSendAsyncFailed: 2
+    # 消息最大长度 默认1024*4(4M)
+    maxMessageSize: 4096
+    # 是否在内部发送失败时重试另一个broker，默认false
+    retryNextServer: false
+    # 压缩消息阈值，默认4k(1024 * 4)
+    compressMessageBodyThreshold: 4096
+  consumer:
+    group: rocketmq-consumer-group
+
+# swagger配置
+# 地址：http://localhost:8080/swagger-ui/index.html
+swagger:
+  enabled: true # true 启用，false 不启用
+  title: 'Swagger数据服务接口文档'
+  base:
+    package: com.sen.netdisk.controller
+  description: 'Swagger数据服务接口文档'
+  url: ''
+  version: 1.0
+
+# 自定义jwt key
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: sensen #JWT加解密使用的密钥
+  expiration: 604800 #JWT的超期限时间(60*60*24)
+  tokenHead: Bearer   #JWT负载中拿到开头
+
+# 日志配置
+logging:
+  config: classpath:logback-spring.xml
+
+# 文件目录
+project:
+  folder:
+    path: D:\code_workspace\IdeaProjects\mushan-imv2-master\netdisk\src\main\resources\static\
+
+
+
+
+
+
